@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivam's Digit Predictor</title>
+    <!-- Include Fabric.js via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fabric@4.6.0/dist/fabric.min.js"></script>
+    <style>
+        /* Basic styles to center the canvas on the page */
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #digitCanvas {
+            border: 1px solid #000;
+            background-color: #fff;
+            width: 280px;
+            height: 280px;
+        }
+        #submitBtn, #clearBtn{
+            margin: 0 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #prediction {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Shivam's Digit Predictor</h1>
+    <p>Draw your digit</p>
+
+    <!-- The canvas where users will draw digits -->
+    <canvas id="digitCanvas" width="280" height="280"></canvas>
+    <br>
+    <div id="buttonContainer">
+        <!-- Submit button to send the drawing for recognition -->
+        <button id="submitBtn">Submit</button>
+        <!-- Clear button to reload the page -->
+        <button id="clearBtn">Clear</button>
+    </div>
+    <p id="prediction">Predicted digit: </p>
+
+    <script>
+        // Initialize the Fabric.js canvas with a larger size to allow easy drawing
+        const canvas = new fabric.Canvas('digitCanvas', {
+            isDrawingMode: true,  // Enable drawing mode
+            width: 280,
+            height: 280,
+            backgroundColor: 'white'
+        });
+
+        // configure brush properties
+        canvas.freeDrawingBrush.color = "black";
+        canvas.freeDrawingBrush.width = 10;  // Adjust as needed for user drawing
+
+        // Function to send the image data to the backend
+        document.getElementById('submitBtn').addEventListener('click', function () {
+            // Get the Base64-encoded image data from the canvas
+            const imageDataURL = canvas.toDataURL('image/png');
+
+            // Send the image data to the backend via POST request
+            fetch('/dig_recognition/predict/', {
+                method: 'POST',
+                //set headers and body
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ image: imageDataURL })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display the predicted digit after the response is given
+                document.getElementById('prediction').textContent = 'Predicted digit: ' + data.prediction;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        // Function to reload the page (clear the canvas)
+        document.getElementById('clearBtn').addEventListener('click', function () {
+            location.reload();
+        });
+
+        // Function to get the CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+
+</body>
+</html>
