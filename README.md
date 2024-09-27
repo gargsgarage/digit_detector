@@ -1,1 +1,3 @@
 Achieved 98% accuracy in predicting handwritten digits by developing a Convolutional Neural Network (CNN) using TensorFlow and Python, incorporating multiple Conv2D, max-pooling, dropout, flatten, and dense layers for optimal feature extraction and classification. Preprocessed and normalized image data, implemented model training with categorical crossentropy loss, and evaluated performance to prevent overfitting. Developed a Django web application to integrate the model, enabling real-time digit classification through a streamlined backend API. Implemented a canvas using Fabric.js in the frontend, allowing users to draw digits and submit them for prediction.
+
+See how it works: https://drive.google.com/file/d/1euExpOjjX1rAOgJi_gxkBbwUc71YaUfi/view?usp=sharing
